@@ -64,9 +64,6 @@ func NewClient(serverAddr string, auth []byte, tlsConfig *tls.Config, quicConfig
 		pktConnFunc:       pktConnFunc,
 		quicReconnectFunc: quicReconnectFunc,
 	}
-	if err := c.connect(); err != nil {
-		return nil, err
-	}
 	return c, nil
 }
 
@@ -182,18 +179,20 @@ func (c *Client) openStreamWithReconnect() (quic.Connection, quic.Stream, error)
 	if c.closed {
 		return nil, nil, ErrClosed
 	}
-	stream, err := c.quicConn.OpenStream()
-	if err == nil {
-		// All good
-		return c.quicConn, &qStream{stream}, nil
-	}
-	// Something is wrong
-	if nErr, ok := err.(net.Error); ok && nErr.Temporary() {
-		// Temporary error, just return
-		return nil, nil, err
-	}
-	if c.quicReconnectFunc != nil {
-		c.quicReconnectFunc(err)
+	if c.quicConn != nil {
+		stream, err := c.quicConn.OpenStream()
+		if err == nil {
+			// All good
+			return c.quicConn, &qStream{stream}, nil
+		}
+		// Something is wrong
+		if nErr, ok := err.(net.Error); ok && nErr.Temporary() {
+			// Temporary error, just return
+			return nil, nil, err
+		}
+		if c.quicReconnectFunc != nil {
+			c.quicReconnectFunc(err)
+		}
 	}
 	// Permanent error, need to reconnect
 	if err := c.connect(); err != nil {
@@ -201,7 +200,7 @@ func (c *Client) openStreamWithReconnect() (quic.Connection, quic.Stream, error)
 		return nil, nil, err
 	}
 	// We are not going to try again even if it still fails the second time
-	stream, err = c.quicConn.OpenStream()
+	stream, err := c.quicConn.OpenStream()
 	return c.quicConn, &qStream{stream}, err
 }
 
