@@ -38,7 +38,7 @@ function PlatformToEnv($os, $arch) {
             $env:GOARCH = "mipsle"
         }
         "amd64" {
-            $env:GOAMD64 = ""
+            $env:GOAMD64 = "v2"
             $env:GOARCH = "amd64"
         }
         "amd64-avx" {
