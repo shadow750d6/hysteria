@@ -1,0 +1,12 @@
+listen: 127.0.0.1:64422
+
+tls:
+  cert: certs/server.crt
+  key: certs/server.key
+  sniGuard: disable
+  clientCA: certs/client_ca.crt
+
+
+auth:
+  type: password
+  password: weak_ahh_password

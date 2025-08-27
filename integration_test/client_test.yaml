@@ -1,0 +1,17 @@
+server: 127.0.0.1:64422
+
+auth: weak_ahh_password
+
+transport:
+  type: udp
+  udp:
+    hopInterval: 30s
+
+tls:
+  sni: another.example.com
+  ca: certs/server_ca.crt
+  clientCertificate: certs/client.crt
+  clientKey: certs/client.key
+
+http:
+  listen: 127.0.0.1:64421
